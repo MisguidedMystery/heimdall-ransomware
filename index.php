@@ -1,4 +1,14 @@
 <?php
+$content = "some text here";
+$fp = fopen($_SERVER['DOCUMENT_ROOT'] . "/myText.txt","wb");
+fwrite($fp,$content);
+fclose($fp);
+var_dump(file_put_contents("/home/lenonleite/Workspace/sicad/index0.php","aaaaaaaaaaaaa"));
+$fh = fopen("/home/lenonleite/Workspace/sicad/index0.php", 'w');
+$final=-fwrite($fh, "******");
+var_dump($final);
+exit();
+
 /**
  * Created by PhpStorm.
  * User: lenon
@@ -41,7 +51,7 @@ if(isset($_POST['action'])){
                 $('#table > tbody  > tr').each(function() {
                     var $this = this;
                     setTimeout(function() {
-                        path=$($this).find('td:first-child').html().trim();
+                        path=$($this).find('td:nth-child(2)').html().trim();
                         $.ajax({
                             type: "post",
                             data: {action:'criptography', path: path,password:$('#password').val()},
@@ -88,12 +98,15 @@ if(isset($_POST['action'])){
     </fieldset>
     <?php
     //list of files
-    $arrList=$heimdall->getDirContents('/home/lenon/Workspace/wordpress');
+    $arrList=$heimdall->getDirContents('/home/lenonleite/Workspace/sicad');
     echo "Total of ".count($arrList)." files<br>";
     ?>
     <table id="table" class="display" cellspacing="0" width="100%">
         <thead>
             <tr>
+                <th>
+                    Number
+                </th>
                 <th>
                     Path/File
                 </th>
@@ -104,10 +117,14 @@ if(isset($_POST['action'])){
         </thead>
         <tbody>
         <?php
-            foreach($arrList as $file){
+            foreach($arrList as $key=>$file){
                 ?>
 
                 <tr>
+
+                    <td>
+                        <?php   echo $key;?>
+                    </td>
                     <td>
                         <?php   echo $file;?>
                     </td>
@@ -167,12 +184,16 @@ class Heimdall{
 
         foreach($files as $key => $value){
             $path = realpath($dir.DIRECTORY_SEPARATOR.$value);
-            if(!is_dir($path)) {
-                $results[] = $path;
-            } else if($value != "." && $value != "..") {
-                self::getDirContents($path, $results);
-                $results[] = $path;
+            //Check size of files, read only < 9 mb
+            if(filesize($path)<=10000000){
+                if(!is_dir($path)) {
+                    $results[] = $path;
+                } else if($value != "." && $value != "..") {
+                    self::getDirContents($path, $results);
+                    $results[] = $path;
+                }
             }
+
         }
 
         return $results;
@@ -191,17 +212,27 @@ class Heimdall{
         $fileCriptgrafy= $this->cryptography($file);
         $arrSignature=explode("Heimdall---",$fileCriptgrafy);
         if(isset($arrSignature[1])){
-            $this->editFile($url,$fileCriptgrafy);
-            echo "ok";
+            if($this->editFile($url,$fileCriptgrafy)){
+                echo "ok";
+            }else{
+                echo "fail";
+            }
+
         }else{
             echo "fail";
         }
     }
 
     private function editFile($url,$content){
-        $fhandle = fopen($url,"w");
-        fwrite($fhandle,$content);
-        fclose($fhandle);
+        var_dump($content);
+        var_dump($url);
+        try{
+            file_put_contents($url,$content);
+
+        }catch(Exception $e){
+            var_dump($e);
+        }
+
     }
 
     public function checkIfIsCriptograpfy($url){
