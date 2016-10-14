@@ -1,13 +1,4 @@
 <?php
-$content = "some text here";
-$fp = fopen($_SERVER['DOCUMENT_ROOT'] . "/myText.txt","wb");
-fwrite($fp,$content);
-fclose($fp);
-var_dump(file_put_contents("/home/lenonleite/Workspace/sicad/index0.php","aaaaaaaaaaaaa"));
-$fh = fopen("/home/lenonleite/Workspace/sicad/index0.php", 'w');
-$final=-fwrite($fh, "******");
-var_dump($final);
-exit();
 
 /**
  * Created by PhpStorm.
@@ -15,15 +6,19 @@ exit();
  * Date: 12/10/16
  * Time: 14:30
  */
+//echo "<pre>";
+//var_dump($_SERVER);
 if(isset($_POST['action'])){
+
     $heimdall= new Heimdall();
+    $heimdall->setPassword($_POST['password']);
     switch ($_POST['action']) {
         case 'criptography':
             $heimdall->criptographyByUrl($_POST['path']);
             exit();
             break;
-        case 1:
-            echo "i equals 1";
+        case 'descriptography':
+            $heimdall->descriptographyByUrl($_POST['path']);
             break;
         case 2:
             echo "i equals 2";
@@ -56,7 +51,7 @@ if(isset($_POST['action'])){
                             type: "post",
                             data: {action:'criptography', path: path,password:$('#password').val()},
                             success:function(data) {
-                                $($this).find('td:last-child').html('encrypted');
+                                $($this).find('td:last-child').html('<span class=\'encrypted\'>encrypted</span>');
                             }
                         });
                     }, 300*i);
@@ -68,9 +63,36 @@ if(isset($_POST['action'])){
 //                    $('#myModal').html(data);
 //                });
             });
+            $('#sendDePass').click(function (){
+                i=1;
+                $('#table > tbody  > tr').each(function() {
+                    var $this = this;
+                    setTimeout(function() {
+                        path=$($this).find('td:nth-child(2)').html().trim();
+                        $.ajax({
+                            type: "post",
+                            data: {action:'descriptography', path: path,password:$('#password').val()},
+                            success:function(data) {
+                                $($this).find('td:last-child').html('<span class=\'decrypted\'>decrypted</span>');
+                            }
+                        });
+                    }, 300*i);
+                    i++;
+                });
+            });
+
+
         });
 
     </script>
+    <style>
+        .encrypted{
+            color:red;
+        }
+        .decrypted{
+            color:blue;
+        }
+    </style>
 </head>
 
 <body>
@@ -88,17 +110,27 @@ if(isset($_POST['action'])){
     ?>
     <fieldset>
         <legend>
-            Heimdall
+            Heimdall Encrypted
         </legend>
         <form id="formCriptography">
-            <label>Password for cryptography</label>
+            <label>Password for encrypted</label>
             <input type="text" name="password" id="password">
             <input type="button" value="Send" id="sendPass">
         </form>
     </fieldset>
+    <fieldset>
+        <legend>
+            Heimdall Decrypted
+        </legend>
+        <form id="formDecriptography">
+            <label>Password for decrypted</label>
+            <input type="text" name="password" id="password">
+            <input type="button" value="Send" id="sendDePass">
+        </form>
+    </fieldset>
     <?php
     //list of files
-    $arrList=$heimdall->getDirContents('/home/lenonleite/Workspace/sicad');
+    $arrList=$heimdall->getDirContents($_SERVER['DOCUMENT_ROOT']);
     echo "Total of ".count($arrList)." files<br>";
     ?>
     <table id="table" class="display" cellspacing="0" width="100%">
@@ -131,9 +163,9 @@ if(isset($_POST['action'])){
                     <td>
                         <?php
                             if($heimdall->checkIfIsCriptograpfy($file)){
-                                echo "encrypted";
+                                echo "<span class='encrypted'>encrypted</span>";
                             }else{
-                                echo "decrypted";
+                                echo "<span class='decrypted'>decrypted</span>";
                             };
 
                         ?>
@@ -223,12 +255,24 @@ class Heimdall{
         }
     }
 
+    public function descriptographyByUrl($url){
+        $file = $this->readFile($url);
+        $arrSignature=explode("Heimdall---",$file);
+        if(isset($arrSignature[1])){
+            $fileDesCriptgrafy= $this->descryptography($arrSignature[1]);
+            if($this->editFile($url,$fileDesCriptgrafy)){
+                echo "ok";
+            }else{
+                echo "fail";
+            }
+        }else{
+            echo "fail";
+        }
+    }
+
     private function editFile($url,$content){
-        var_dump($content);
-        var_dump($url);
         try{
             file_put_contents($url,$content);
-
         }catch(Exception $e){
             var_dump($e);
         }
