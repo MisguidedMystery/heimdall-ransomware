@@ -109,6 +109,7 @@ if(isset($_POST['action'])){
                 function prepareSendData(action,password){
                     var collection = [];
                     var totalResultsForRequest = 500;
+                    var steepTime = 5000;
 
                     for ( var i = totalResultsForRequest; i <= $('#totalOfResults').html().trim(); i=i+totalResultsForRequest ) {
                         collection.push(i);
@@ -119,7 +120,7 @@ if(isset($_POST['action'])){
                         setTimeout(function () {
                             var j = collection.shift();
                             sendData(action, password,j-totalResultsForRequest ,j);
-                        }, 2000 * iTime);
+                        }, steepTime * iTime);
                         iTime++;
                     }
                     $('.message-green').html('Action finished!!');
