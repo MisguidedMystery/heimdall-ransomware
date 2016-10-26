@@ -373,6 +373,11 @@ class Heimdall{
     }
 
     public function readFile($url){
+
+        if(empty($url)){
+            return "";
+        }
+
         return file_get_contents($url);
     }
 
