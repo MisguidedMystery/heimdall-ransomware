@@ -1,5 +1,5 @@
 <!-- BADGES -->
-[![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org) [![Bitcoin Paypal](https://img.shields.io/badge/paypal-donate-yellow.svg)](http://lenonleite.com.br/blog/2016/10/26/doacao/) [![Bitcoin Paypal](https://img.shields.io/badge/bitcoin-donate-yellow.svg)](http://lenonleite.com.br/blog/2016/10/26/doacao/)
+[![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org) [![Bitcoin Paypal](https://img.shields.io/badge/paypal-donate-yellow.svg)](http://lenonleite.com.br/en/blog/2016/10/26/doacao/) [![Bitcoin Paypal](https://img.shields.io/badge/bitcoin-donate-yellow.svg)](http://lenonleite.com.br/en/blog/2016/10/26/doacao/)
 
 <!-- /BADGES -->
 
