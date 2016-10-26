@@ -5,10 +5,10 @@
 
 # heimdall Ransomware
 
-## Atettion
-> This project is a only concept prove and study of case. The ideia is prove for all the big extension of PHP and your utilities including vírus and malicious code.
-> The utilization for real life is probably that is case of police in your country.
-> Is recommend that use in ambient control, with files with backup.
+## Attention
+> This project is only a concept prove and study of case. The ideia is prove for all the big extension of PHP and your utilities including vírus and malicious code.
+> The utilization for real life is probably case of police in your country.
+> Is recommend that use in controlled environment, with files with backup.
 
 ## What is the Ransomwre?
 > Is computer malware that installs covertly on a victim's computer, executes a cryptovirology attack that adversely affects it, and demands a ransom payment to decrypt it or not publish it.
@@ -16,7 +16,7 @@
 
 ## What is the Heimdall?
 > Heimdall is a ransomware file writte in PHP language and it run in services web
-> It crypted all files with a password register and only decrypted files with this password equal
+> Heimdall encrypted all files with a password register and only decrypted files with this password
 
 ## Instalation
 > git clone https://github.com/aszone/heimdall-ransomware.git
