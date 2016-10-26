@@ -18,10 +18,13 @@
 > Heimdall is a ransomware file writte in PHP language and it run in services web
 > It crypted all files with a password register and only decrypted files with this password equal
 
+## Instalation
+> git clone https://github.com/aszone/heimdall-ransomware.git
+
 ## How the heimdall work? Youtube Link.
 [![Youtube with heimdall worked](https://img.youtube.com/vi/AQNPDyiW1dc/3.jpg)](https://www.youtube.com/watch?v=AQNPDyiW1dc)
 
-### Images
+### Screenshots
 [![Image of Heimdall](http://lenonleite.com.br/wp-content/uploads/2016/10/Screenshot-from-2016-10-26-01-56-41.png)](http://lenonleite.com.br/wp-content/uploads/2016/10/Screenshot-from-2016-10-26-01-56-41.png)
 
 ### Other Projects ASZone
