@@ -10,7 +10,7 @@
 > The utilization for real life is probably case of police in your country.
 > Is recommend that use in controlled environment, with files with backup.
 
-## What is the Ransomwre?
+## What is the Ransomware?
 > Is computer malware that installs covertly on a victim's computer, executes a cryptovirology attack that adversely affects it, and demands a ransom payment to decrypt it or not publish it.
 [Ransomware in wikipedia](https://pt.wikipedia.org/wiki/Ransomware)
 
